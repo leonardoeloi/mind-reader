@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Mind Reader</title>
+        <item>
+            <title>0.1.1</title>
+            <pubDate>Wed, 10 Jun 2026 23:15:49 +0100</pubDate>
+            <link>https://github.com/leonardoeloi/mindreader-releases</link>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.1.zip" length="1602939" type="application/octet-stream" sparkle:edSignature="R6AKg1bM8jyWiGUlAkK2ozrVfevuhvAItWST0rPtxaoiUHaZlPMpz+bPi6674b/CHG04w6y6C6hfZpOFjmPGAw=="/>
+        </item>
+    </channel>
+</rss>
