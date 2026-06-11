@@ -3,6 +3,19 @@
     <channel>
         <title>Mind Reader</title>
         <item>
+            <title>0.1.2</title>
+            <pubDate>Thu, 11 Jun 2026 19:16:13 +0100</pubDate>
+            <link>https://github.com/leonardoeloi/mindreader-releases</link>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.2.zip" length="48827462" type="application/octet-stream" sparkle:edSignature="gV4KvF+a5jffZ/YeJlUolrWU5U0xA4+pD+jhWAXF+lXydvIaefmnPz8N4To/3m1yljmYAh3UoiTxw9PrECQBBQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/Mind%20Reader3-2.delta" sparkle:deltaFrom="2" length="25535070" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977712" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="8Y/Gc+F1Enp0RlXgWS01H+qopzwxv95ShnjfJLLPakoHnSqAxifsEro3LE/2vBNDQ9KVjoOPJGQ0X5NNrnLuCg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Wed, 10 Jun 2026 23:15:49 +0100</pubDate>
             <link>https://github.com/leonardoeloi/mindreader-releases</link>
