@@ -1,0 +1,35 @@
+name: stats snapshot
+# Snapshot diário dos download counts (o GitHub só expõe o valor CUMULATIVO atual;
+# o histórico para o gráfico de adoção vem destes commits diários).
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: snapshot download counts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/releases \
+            --jq '[.[] | .assets[] | select(.name | endswith(".zip")) | {name: .name, downloads: .download_count}]' \
+            > /tmp/today.json
+          python3 - <<'PYEOF'
+          import json, os, datetime
+          path = "stats/history.json"
+          hist = json.load(open(path)) if os.path.exists(path) else []
+          date = datetime.date.today().isoformat()
+          today = json.load(open("/tmp/today.json"))
+          hist = [h for h in hist if h["date"] != date] + [{"date": date, "assets": today}]
+          os.makedirs("stats", exist_ok=True)
+          json.dump(hist, open(path, "w"), indent=1)
+          PYEOF
+          git config user.name "stats-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add stats/history.json
+          git diff --cached --quiet || { git commit -m "stats: snapshot $(date -u +%F)"; git push; }

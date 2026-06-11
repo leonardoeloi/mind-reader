@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind Reader — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background:#0b0b0d; color:#ececf1; font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; padding:40px 24px; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+  .logo { width:52px; height:52px; border-radius:12px; background:linear-gradient(#18181b,#000); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; }
+  h1 { font-size:22px; font-weight:600; }
+  .sub { color:#9a9aa3; font-size:13px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:22px 0; }
+  .card { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px 18px; }
+  .card .n { font-size:30px; font-weight:650; letter-spacing:-.5px; }
+  .card .l { color:#9a9aa3; font-size:12px; margin-top:2px; }
+  .panel { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:18px; margin-bottom:14px; }
+  h2 { font-size:14px; font-weight:600; color:#c9c9d1; margin-bottom:12px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  td, th { text-align:left; padding:7px 4px; border-bottom:1px solid rgba(255,255,255,.06); }
+  th { color:#9a9aa3; font-weight:500; font-size:12px; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  footer { color:#6d6d76; font-size:12px; margin-top:22px; }
+  a { color:#8ab4ff; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg width="34" height="24" viewBox="0 0 20 14"><g fill="#fff"><rect x="1.8" y="1.2" width="3.2" height="11.6" rx="1.6"/><rect x="6.6" y="4.5" width="7.4" height="5" rx="2.5" opacity=".95"/><rect x="15.2" y="4.5" width="4" height="5" rx="2" opacity=".5"/></g></svg>
+    </div>
+    <div>
+      <h1>Mind Reader</h1>
+      <div class="sub">Dashboard de adoção — downloads e updates por versão</div>
+    </div>
+  </header>
+
+  <div class="cards">
+    <div class="card"><div class="n" id="total">…</div><div class="l">downloads totais (todas as versões)</div></div>
+    <div class="card"><div class="n" id="latest">…</div><div class="l" id="latestLabel">downloads da versão mais recente</div></div>
+    <div class="card"><div class="n" id="versions">…</div><div class="l">versões publicadas</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Adoção ao longo do tempo (snapshot diário)</h2>
+    <canvas id="chart" height="110"></canvas>
+  </div>
+
+  <div class="panel">
+    <h2>Por versão (ao vivo, via API do GitHub)</h2>
+    <table id="tbl"><thead><tr><th>Asset</th><th class="num">Downloads</th><th>Última atualização</th></tr></thead><tbody></tbody></table>
+  </div>
+
+  <footer>
+    Fonte: contagem pública de downloads dos assets de release (cada update via Sparkle conta um download).
+    Nenhuma telemetria roda no app — <a href="https://github.com/leonardoeloi/mindreader-releases">repo</a>.
+  </footer>
+</div>
+
+<script>
+const REPO = "leonardoeloi/mindreader-releases";
+const COLORS = ["#8ab4ff","#7ce3b1","#ffd479","#ff9d9d","#c79bff","#7fd8e8"];
+
+async function live() {
+  const r = await fetch(`https://api.github.com/repos/${REPO}/releases`);
+  const releases = await r.json();
+  const assets = releases.flatMap(rel => rel.assets.filter(a => a.name.endsWith(".zip")));
+  assets.sort((a,b) => a.name.localeCompare(b.name));
+  const total = assets.reduce((s,a) => s + a.download_count, 0);
+  document.getElementById("total").textContent = total;
+  document.getElementById("versions").textContent = assets.length;
+  const last = assets[assets.length-1];
+  if (last) {
+    document.getElementById("latest").textContent = last.download_count;
+    document.getElementById("latestLabel").textContent = `downloads — ${last.name.replace("MindReader-","").replace(".zip","")}`;
+  }
+  const tb = document.querySelector("#tbl tbody");
+  tb.innerHTML = assets.map(a =>
+    `<tr><td>${a.name}</td><td class="num">${a.download_count}</td><td>${new Date(a.updated_at).toLocaleDateString("pt-BR")}</td></tr>`
+  ).join("");
+}
+
+async function history() {
+  const r = await fetch("stats/history.json", {cache:"no-store"});
+  const hist = await r.json();
+  const names = [...new Set(hist.flatMap(h => h.assets.map(a => a.name)))].sort();
+  const datasets = names.map((n,i) => ({
+    label: n.replace("MindReader-","").replace(".zip",""),
+    data: hist.map(h => (h.assets.find(a => a.name===n) || {}).downloads ?? null),
+    borderColor: COLORS[i % COLORS.length],
+    backgroundColor: "transparent",
+    tension: .25, spanGaps: true, pointRadius: 3,
+  }));
+  new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: { labels: hist.map(h => h.date), datasets },
+    options: {
+      plugins: { legend: { labels: { color: "#c9c9d1", boxWidth: 18 } } },
+      scales: {
+        x: { ticks: { color: "#9a9aa3" }, grid: { color: "rgba(255,255,255,.05)" } },
+        y: { beginAtZero: true, ticks: { color: "#9a9aa3", precision: 0 }, grid: { color: "rgba(255,255,255,.05)" } },
+      },
+    },
+  });
+}
+
+live().catch(e => console.error(e));
+history().catch(e => console.error(e));
+</script>
+</body>
+</html>
