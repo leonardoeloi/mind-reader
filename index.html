@@ -553,8 +553,8 @@
      Fallback URLs below are used if the appcast can't be read. The real download
      button is then re-pointed at the LATEST build by parsing appcast.xml (same
      origin, served from this site's root) — so it never goes stale per release. */
-  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.7.zip";
-  var RELEASES_URL = "https://github.com/leonardoeloi/mindreader-releases/releases";
+  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.7.zip";
+  var RELEASES_URL = "https://github.com/leonardoeloi/mind-reader/releases";
   function setDownload(url){["nav-dl","hero-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
   function setReleases(url){["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
   setDownload(DOWNLOAD_URL); setReleases(RELEASES_URL);

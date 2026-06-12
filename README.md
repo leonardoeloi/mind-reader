@@ -2,8 +2,8 @@
 
 Public home for **Mind Reader**, the local autocomplete app for macOS.
 
-- **Landing page** → https://leonardoeloi.github.io/mindreader-releases/ (served by GitHub Pages from this repo's root `index.html`)
-- **Download** → the `MindReader-*.zip` assets on the [`appcast` release](https://github.com/leonardoeloi/mindreader-releases/releases/tag/appcast)
+- **Landing page** → https://leonardoeloi.github.io/mind-reader/ (served by GitHub Pages from this repo's root `index.html`)
+- **Download** → the `MindReader-*.zip` assets on the [`appcast` release](https://github.com/leonardoeloi/mind-reader/releases/tag/appcast)
 - **Auto-update feed** → `appcast.xml` (Sparkle reads this; published by `scripts/release.sh` in the app repo)
 - **Adoption dashboard** → `/stats.html` (download counts; `stats/history.json` snapshotted daily by `.github/workflows/stats-snapshot.yml`)
 

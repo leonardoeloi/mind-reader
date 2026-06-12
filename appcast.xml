@@ -5,12 +5,12 @@
         <item>
             <title>0.1.7</title>
             <pubDate>Fri, 12 Jun 2026 15:42:05 +0100</pubDate>
-            <link>https://github.com/leonardoeloi/mindreader-releases</link>
+            <link>https://github.com/leonardoeloi/mind-reader</link>
             <sparkle:version>8</sparkle:version>
             <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.7.zip" length="150940801" type="application/octet-stream" sparkle:edSignature="Sykr3651Oi1PcWqkc65/GM5X+fqNQWYT1YuyfIkIVhxP45TA/ACUqzZKUKimHZgqNBsCUgpV975Z2HeHln+tDg=="/>
+            <enclosure url="https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.7.zip" length="150940801" type="application/octet-stream" sparkle:edSignature="Sykr3651Oi1PcWqkc65/GM5X+fqNQWYT1YuyfIkIVhxP45TA/ACUqzZKUKimHZgqNBsCUgpV975Z2HeHln+tDg=="/>
         </item>
     </channel>
 </rss>
