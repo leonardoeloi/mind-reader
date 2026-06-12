@@ -1,116 +1,643 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mind Reader — Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mind Reader — Local autocomplete for every Mac app</title>
+<meta name="description" content="Mind Reader adds intelligent, inline autocomplete to every text field on your Mac — running entirely on-device. Type, see the rest in ghost text, press Tab to keep it." />
+
+<!-- Open Graph -->
+<meta property="og:title" content="Mind Reader — It knows what you're about to type" />
+<meta property="og:description" content="Intelligent, on-device autocomplete for every text field on macOS. Private by design. Free." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="mindreader-icon@2x.png" />
+
+<link rel="icon" type="image/png" href="mindreader-icon.png" />
+<link rel="apple-touch-icon" href="mindreader-icon.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
 <style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; margin: 0; }
-  body { background:#0b0b0d; color:#ececf1; font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; padding:40px 24px; }
-  .wrap { max-width: 880px; margin: 0 auto; }
-  header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
-  .logo { width:52px; height:52px; border-radius:12px; background:linear-gradient(#18181b,#000); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; }
-  h1 { font-size:22px; font-weight:600; }
-  .sub { color:#9a9aa3; font-size:13px; }
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:22px 0; }
-  .card { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px 18px; }
-  .card .n { font-size:30px; font-weight:650; letter-spacing:-.5px; }
-  .card .l { color:#9a9aa3; font-size:12px; margin-top:2px; }
-  .panel { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:18px; margin-bottom:14px; }
-  h2 { font-size:14px; font-weight:600; color:#c9c9d1; margin-bottom:12px; }
-  table { width:100%; border-collapse:collapse; font-size:14px; }
-  td, th { text-align:left; padding:7px 4px; border-bottom:1px solid rgba(255,255,255,.06); }
-  th { color:#9a9aa3; font-weight:500; font-size:12px; }
-  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
-  footer { color:#6d6d76; font-size:12px; margin-top:22px; }
-  a { color:#8ab4ff; text-decoration:none; }
+  :root{
+    --ink:#0b0c10;
+    --ink-2:#121319;
+    --ink-3:#1a1c24;
+    --line:#262833;
+    --cream:#ece6d8;
+    --cream-dim:#b7b2a6;
+    --ghost:#6a6d78;
+    --paper:#f4f0e7;
+    --paper-ink:#1a1813;
+    --amber:#f0b45c;
+    --amber-deep:#e09a3a;
+    --mint:#7fdcb4;
+    --radius:16px;
+    --maxw:1180px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--ink);
+    color:var(--cream);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* film grain overlay */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    z-index:9999;
+    pointer-events:none;
+    opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--amber);color:var(--ink)}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    backdrop-filter:saturate(160%) blur(14px);
+    -webkit-backdrop-filter:saturate(160%) blur(14px);
+    background:rgba(11,12,16,.62);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s,background .3s;
+  }
+  nav.scrolled{border-bottom:1px solid var(--line);background:rgba(11,12,16,.86)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:-.01em;font-size:1.05rem}
+  .brand img{width:30px;height:30px;border-radius:7px;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+  .nav-links{display:flex;align-items:center;gap:34px}
+  .nav-links a.link{font-size:.94rem;color:var(--cream-dim);transition:color .2s}
+  .nav-links a.link:hover{color:var(--cream)}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:var(--sans);font-weight:600;font-size:.95rem;
+    padding:11px 20px;border-radius:11px;cursor:pointer;border:none;
+    transition:transform .18s var(--ease),box-shadow .25s,background .25s;
+  }
+  .btn-primary{
+    background:linear-gradient(180deg,var(--amber),var(--amber-deep));
+    color:#231803;
+    box-shadow:0 6px 22px -6px rgba(240,180,92,.55),inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(240,180,92,.65),inset 0 1px 0 rgba(255,255,255,.45)}
+  .btn-ghost{background:var(--ink-3);color:var(--cream);border:1px solid var(--line)}
+  .btn-ghost:hover{background:var(--ink-2);transform:translateY(-2px)}
+  .nav .btn{padding:9px 17px}
+  @media(max-width:780px){.nav-links .link{display:none}}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;padding:78px 0 90px;overflow:hidden}
+  .hero::after{
+    content:"";position:absolute;z-index:0;
+    width:780px;height:780px;left:50%;top:-220px;transform:translateX(-30%);
+    background:radial-gradient(circle,rgba(240,180,92,.20),rgba(240,180,92,0) 62%);
+    filter:blur(20px);pointer-events:none;
+  }
+  .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.02fr 1.08fr;gap:56px;align-items:center}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:var(--mono);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--amber);
+    padding:6px 13px;border:1px solid rgba(240,180,92,.32);border-radius:100px;
+    background:rgba(240,180,92,.06);
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint)}
+  h1{
+    font-family:var(--serif);
+    font-weight:340;
+    font-size:clamp(2.7rem,5.6vw,4.5rem);
+    line-height:1.02;
+    letter-spacing:-.02em;
+    margin:24px 0 0;
+  }
+  h1 em{font-style:italic;color:var(--amber)}
+  .lead{
+    font-size:clamp(1.05rem,1.5vw,1.22rem);
+    color:var(--cream-dim);
+    max-width:33ch;
+    margin:26px 0 34px;
+  }
+  .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .hero-cta .btn{padding:15px 26px;font-size:1rem}
+  .req-note{font-family:var(--mono);font-size:.8rem;color:var(--cream-dim);opacity:.85}
+  .req-note b{color:var(--cream)}
+
+  /* ---------- DEMO WINDOW ---------- */
+  .demo-stage{position:relative}
+  .win{
+    background:var(--paper);
+    border-radius:14px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06);
+    overflow:hidden;
+    transform:perspective(1600px) rotateY(-7deg) rotateX(2deg);
+    transition:transform .5s var(--ease);
+  }
+  .demo-stage:hover .win{transform:perspective(1600px) rotateY(-3deg) rotateX(1deg)}
+  .win-bar{display:flex;align-items:center;gap:8px;padding:13px 16px;background:#e6e1d6;border-bottom:1px solid #d6d0c2}
+  .tl{width:12px;height:12px;border-radius:50%}
+  .tl.r{background:#ff5f57}.tl.y{background:#febc2e}.tl.g{background:#28c840}
+  .win-title{flex:1;text-align:center;font-size:.8rem;color:#8a857a;font-weight:500;margin-right:42px}
+  .win-body{padding:30px 30px 34px;min-height:280px;background:var(--paper)}
+  .doc-meta{font-size:.74rem;color:#a59f92;font-family:var(--mono);margin-bottom:18px;letter-spacing:.04em}
+  .doc-text{
+    font-family:var(--serif);font-weight:330;
+    font-size:1.42rem;line-height:1.62;color:var(--paper-ink);
+    letter-spacing:-.005em;
+  }
+  .typed{color:var(--paper-ink)}
+  .ghost{color:#aaa49a}
+  .ghost.accepting{color:var(--amber-deep);transition:color .15s}
+  .caret{
+    display:inline-block;width:2px;height:1.15em;
+    background:var(--amber-deep);margin:0 1px -0.18em;border-radius:1px;
+    animation:blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0}}
+  .key-hint{
+    position:absolute;right:-14px;bottom:30px;
+    display:flex;align-items:center;gap:9px;
+    background:var(--ink-2);border:1px solid var(--line);
+    padding:10px 15px;border-radius:12px;
+    box-shadow:0 14px 30px -10px rgba(0,0,0,.7);
+    font-size:.86rem;color:var(--cream-dim);
+    opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;
+  }
+  .key-hint.show{opacity:1;transform:translateY(0)}
+  kbd{
+    font-family:var(--mono);font-size:.8rem;color:var(--cream);
+    background:linear-gradient(180deg,#23252f,#16171e);
+    border:1px solid #34373f;border-bottom-width:2px;
+    padding:3px 9px;border-radius:7px;line-height:1;
+  }
+
+  /* ---------- PILLARS ---------- */
+  .pillars{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ink-2)}
+  .pillars-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+  .pillar{padding:38px 30px;border-right:1px solid var(--line)}
+  .pillar:last-child{border-right:none}
+  .pillar .ic{font-size:1.4rem;margin-bottom:12px}
+  .pillar h3{font-family:var(--sans);font-weight:600;font-size:1.05rem;margin-bottom:6px}
+  .pillar p{font-size:.92rem;color:var(--cream-dim)}
+  @media(max-width:760px){.pillars-grid{grid-template-columns:1fr}.pillar{border-right:none;border-bottom:1px solid var(--line)}.pillar:last-child{border-bottom:none}}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:96px 0}
+  .sec-head{max-width:660px;margin-bottom:54px}
+  .sec-tag{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+  .sec-head h2{
+    font-family:var(--serif);font-weight:340;letter-spacing:-.02em;
+    font-size:clamp(2rem,3.6vw,2.9rem);line-height:1.08;margin:16px 0 14px;
+  }
+  .sec-head h2 em{font-style:italic;color:var(--amber)}
+  .sec-head p{font-size:1.08rem;color:var(--cream-dim)}
+
+  /* ---------- KEYS ---------- */
+  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:760px){.keys{grid-template-columns:repeat(2,1fr)}}
+  .keycard{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 22px;transition:border-color .3s,transform .3s;
+  }
+  .keycard:hover{border-color:rgba(240,180,92,.4);transform:translateY(-3px)}
+  .keycard .kk{
+    display:inline-block;font-family:var(--mono);font-size:1.05rem;color:var(--cream);
+    background:linear-gradient(180deg,#23252f,#15161d);
+    border:1px solid #34373f;border-bottom-width:3px;
+    padding:9px 15px;border-radius:10px;margin-bottom:16px;
+  }
+  .keycard h4{font-weight:600;font-size:1rem;margin-bottom:5px}
+  .keycard p{font-size:.9rem;color:var(--cream-dim)}
+
+  /* ---------- FEATURES ---------- */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:920px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+  .feat{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px 26px;position:relative;overflow:hidden;
+    transition:border-color .3s,transform .3s,background .3s;
+  }
+  .feat::before{
+    content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(240,180,92,.10),transparent 60%);
+  }
+  .feat:hover{border-color:rgba(240,180,92,.34);transform:translateY(-4px)}
+  .feat:hover::before{opacity:1}
+  .feat .fic{
+    width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+    background:rgba(240,180,92,.12);border:1px solid rgba(240,180,92,.28);
+    margin-bottom:18px;font-size:1.25rem;
+  }
+  .feat h3{font-family:var(--sans);font-weight:600;font-size:1.08rem;margin-bottom:8px;position:relative}
+  .feat p{font-size:.94rem;color:var(--cream-dim);position:relative}
+
+  /* ---------- HOW IT WORKS ---------- */
+  .how{background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:step}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{position:relative;padding-top:14px}
+  .step .num{
+    font-family:var(--serif);font-style:italic;font-size:3.4rem;color:var(--amber);
+    line-height:1;opacity:.85;margin-bottom:16px;
+  }
+  .step h3{font-size:1.2rem;font-weight:600;margin-bottom:8px}
+  .step p{color:var(--cream-dim);font-size:.98rem}
+  .privacy-banner{
+    margin-top:56px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;
+    text-align:center;padding:22px 28px;border-radius:14px;
+    background:rgba(127,220,180,.06);border:1px solid rgba(127,220,180,.22);
+    font-size:1rem;color:var(--cream);
+  }
+  .privacy-banner .lock{font-size:1.3rem}
+  .privacy-banner b{color:var(--mint)}
+
+  /* ---------- GET STARTED ---------- */
+  .start-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  @media(max-width:860px){.start-grid{grid-template-columns:1fr}}
+  .reqs{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+  .reqs h3{font-size:1.05rem;margin-bottom:18px}
+  .reqs ul{list-style:none}
+  .reqs li{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--line);font-size:.96rem}
+  .reqs li:last-child{border-bottom:none}
+  .reqs li .ck{color:var(--mint);flex-shrink:0;font-weight:700}
+  .reqs li span.t{color:var(--cream-dim)}
+  .reqs li b{color:var(--cream)}
+
+  .install ol{list-style:none;counter-reset:inst}
+  .install li{
+    position:relative;padding:0 0 22px 46px;counter-increment:inst;
+  }
+  .install li::before{
+    content:counter(inst);position:absolute;left:0;top:-2px;
+    width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+    background:rgba(240,180,92,.12);border:1px solid rgba(240,180,92,.3);
+    font-family:var(--mono);font-size:.85rem;color:var(--amber);
+  }
+  .install li:not(:last-child)::after{
+    content:"";position:absolute;left:14px;top:30px;bottom:6px;width:1px;background:var(--line);
+  }
+  .install h4{font-weight:600;font-size:1rem;margin-bottom:4px}
+  .install p{font-size:.92rem;color:var(--cream-dim)}
+  .codeblock{
+    display:block;font-family:var(--mono);font-size:.82rem;color:var(--cream);
+    background:var(--ink);border:1px solid var(--line);border-radius:9px;
+    padding:11px 14px;margin-top:9px;overflow-x:auto;white-space:nowrap;
+  }
+  .codeblock .c{color:var(--ghost)}
+
+  /* ---------- FAQ ---------- */
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-q{
+    width:100%;text-align:left;background:none;border:none;cursor:pointer;color:var(--cream);
+    font-family:var(--sans);font-size:1.1rem;font-weight:500;
+    padding:24px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;
+  }
+  .faq-q .pm{font-size:1.5rem;color:var(--amber);transition:transform .3s var(--ease);flex-shrink:0;line-height:1}
+  .faq-item.open .faq-q .pm{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
+  .faq-a p{padding:0 0 24px;color:var(--cream-dim);font-size:1rem;max-width:70ch}
+  .faq-a code{font-family:var(--mono);font-size:.86em;background:var(--ink-2);padding:2px 6px;border-radius:5px;color:var(--amber)}
+
+  /* ---------- FINAL CTA ---------- */
+  .final{position:relative;text-align:center;overflow:hidden}
+  .final::after{
+    content:"";position:absolute;width:760px;height:600px;left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,rgba(240,180,92,.16),transparent 60%);filter:blur(10px);
+    pointer-events:none;
+  }
+  .final .inner{position:relative;z-index:1}
+  .final img{width:84px;height:84px;border-radius:20px;box-shadow:0 18px 40px -12px rgba(0,0,0,.7);margin-bottom:26px}
+  .final h2{font-family:var(--serif);font-weight:340;font-size:clamp(2.1rem,4.4vw,3.3rem);line-height:1.06;letter-spacing:-.02em}
+  .final h2 em{font-style:italic;color:var(--amber)}
+  .final p{color:var(--cream-dim);font-size:1.1rem;margin:18px auto 34px;max-width:46ch}
+  .final .btn{padding:16px 30px;font-size:1.05rem}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line);padding:46px 0;color:var(--cream-dim)}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+  .foot-brand{display:flex;align-items:center;gap:11px;font-weight:600;color:var(--cream)}
+  .foot-brand img{width:26px;height:26px;border-radius:6px}
+  .foot-meta{font-size:.86rem;max-width:48ch;line-height:1.5}
+  .foot-links{display:flex;gap:24px;font-size:.9rem}
+  .foot-links a:hover{color:var(--cream)}
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .caret{animation:none}
+    *{scroll-behavior:auto}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo" aria-hidden="true">
-      <svg width="34" height="24" viewBox="0 0 20 14"><g fill="#fff"><rect x="1.8" y="1.2" width="3.2" height="11.6" rx="1.6"/><rect x="6.6" y="4.5" width="7.4" height="5" rx="2.5" opacity=".95"/><rect x="15.2" y="4.5" width="4" height="5" rx="2" opacity=".5"/></g></svg>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><img src="mindreader-icon.png" alt="Mind Reader" /> Mind Reader</a>
+    <div class="nav-links">
+      <a class="link" href="#features">Features</a>
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#start">Get started</a>
+      <a class="link" href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#download" id="nav-dl">Download</a>
     </div>
-    <div>
-      <h1>Mind Reader</h1>
-      <div class="sub">Dashboard de adoção — downloads e updates por versão</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span> Local autocomplete for macOS</span>
+      <h1>It knows what<br>you're <em>about to type.</em></h1>
+      <p class="lead">Mind Reader adds intelligent, inline autocomplete to every text field on your Mac — running entirely on-device. Type, see the rest in ghost text, press <strong>Tab</strong> to keep it.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#download" id="hero-dl">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+          Download for Mac
+        </a>
+        <span class="req-note">Free · <b>Apple Silicon</b> · macOS&nbsp;14+</span>
+      </div>
     </div>
-  </header>
 
-  <div class="cards">
-    <div class="card"><div class="n" id="total">…</div><div class="l">downloads totais (todas as versões)</div></div>
-    <div class="card"><div class="n" id="latest">…</div><div class="l" id="latestLabel">downloads da versão mais recente</div></div>
-    <div class="card"><div class="n" id="versions">…</div><div class="l">versões publicadas</div></div>
+    <!-- LIVE DEMO -->
+    <div class="demo-stage reveal">
+      <div class="win">
+        <div class="win-bar">
+          <span class="tl r"></span><span class="tl y"></span><span class="tl g"></span>
+          <span class="win-title">Untitled — Notes</span>
+        </div>
+        <div class="win-body">
+          <div class="doc-meta">Today · 9:41 AM</div>
+          <div class="doc-text"><span id="demo-typed" class="typed"></span><span id="demo-ghost" class="ghost"></span><span class="caret" id="demo-caret"></span></div>
+        </div>
+      </div>
+      <div class="key-hint" id="key-hint"><kbd>Tab ⇥</kbd> to accept</div>
+    </div>
   </div>
+</header>
 
-  <div class="panel">
-    <h2>Adoção ao longo do tempo (snapshot diário)</h2>
-    <canvas id="chart" height="110"></canvas>
+<!-- PILLARS -->
+<div class="pillars">
+  <div class="wrap pillars-grid">
+    <div class="pillar"><div class="ic">🔒</div><h3>Private by design</h3><p>Every suggestion is generated on your Mac. Nothing you type ever leaves the device.</p></div>
+    <div class="pillar"><div class="ic">✦</div><h3>Works everywhere</h3><p>Notes, Mail, Slack, your browser — any text field on the system, native or web.</p></div>
+    <div class="pillar"><div class="ic">◑</div><h3>Learns your voice</h3><p>It picks up your phrasing from what you accept, plus an optional style document.</p></div>
   </div>
-
-  <div class="panel">
-    <h2>Por versão (ao vivo, via API do GitHub)</h2>
-    <table id="tbl"><thead><tr><th>Asset</th><th class="num">Downloads</th><th>Última atualização</th></tr></thead><tbody></tbody></table>
-  </div>
-
-  <footer>
-    Fonte: contagem pública de downloads dos assets de release (cada update via Sparkle conta um download).
-    Nenhuma telemetria roda no app — <a href="https://github.com/leonardoeloi/mindreader-releases">repo</a>.
-  </footer>
 </div>
 
+<!-- KEYS -->
+<section id="keys">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">The whole interaction</span>
+      <h2>Four keys. <em>That's the app.</em></h2>
+      <p>No menus to learn, no pop-ups to dismiss. Keep typing — the suggestion floats ahead of your cursor, and you decide what to keep.</p>
+    </div>
+    <div class="keys">
+      <div class="keycard reveal"><span class="kk">Tab ⇥</span><h4>Take a word</h4><p>Accepts the next word and keeps the rest in ghost text.</p></div>
+      <div class="keycard reveal"><span class="kk">`</span><h4>Take the line</h4><p>Accepts the whole suggestion at once. (Configurable key.)</p></div>
+      <div class="keycard reveal"><span class="kk">Esc</span><h4>Wave it away</h4><p>Dismisses the suggestion and holds off for a moment.</p></div>
+      <div class="keycard reveal"><span class="kk">⌃⌥⌘L</span><h4>Toggle off</h4><p>Pauses Mind Reader instantly. It lives quietly in your menu bar.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Features</span>
+      <h2>Small utility. <em>Deep where it counts.</em></h2>
+      <p>Mind Reader is a tray-only app that does one thing — finish your sentences well — and sweats every detail to do it without ever getting in your way.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal"><div class="fic">🪟</div><h3>Every app, not just some</h3><p>Reads native text fields through Accessibility, and falls back to a keystroke engine for Electron and web apps like Slack and Chrome.</p></div>
+      <div class="feat reveal"><div class="fic">⚡</div><h3>On-device inference</h3><p>Runs on Apple's built-in Foundation Models, or a local Ollama model on <code style="font-family:var(--mono);font-size:.85em">localhost</code>. Your choice, your machine.</p></div>
+      <div class="feat reveal"><div class="fic">👻</div><h3>Ghost text, never intrusive</h3><p>The suggestion lives in a floating overlay that never touches your text — so it can't pollute undo or fight your cursor. Only Tab commits it.</p></div>
+      <div class="feat reveal"><div class="fic">◑</div><h3>Learns your style</h3><p>Few-shot learning from the suggestions you accept, plus an optional reference document so it sounds like you, not like a model.</p></div>
+      <div class="feat reveal"><div class="fic">⚙︎</div><h3>Per-app instructions</h3><p>Give it different guidance for email, chat, and notes. Each app gets its own tone on top of your global style.</p></div>
+      <div class="feat reveal"><div class="fic">🧠</div><h3>Context-aware</h3><p>Reads your clipboard and — if you allow it — what's on screen via on-device OCR, so suggestions fit the moment.</p></div>
+      <div class="feat reveal"><div class="fic">↔︎</div><h3>Fill-in-the-middle</h3><p>Looks at the text after your cursor too, so completions stay coherent with what already comes next.</p></div>
+      <div class="feat reveal"><div class="fic">🎯</div><h3>Pixel-perfect overlay</h3><p>Matches your field's real font size and follows you correctly across multiple monitors. No flicker, no jitter.</p></div>
+      <div class="feat reveal"><div class="fic">🌊</div><h3>Streaming suggestions</h3><p>Words appear in the ghost as the model thinks them, so it feels instant instead of waiting for a full sentence.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how" id="how">
+  <section style="padding-top:90px;padding-bottom:90px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-tag">How it works</span>
+        <h2>You type. <em>It listens. You keep what fits.</em></h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><div class="num">1</div><h3>Type anywhere</h3><p>Write like you always do, in whatever app you're already in. Mind Reader watches the field you're focused on.</p></div>
+        <div class="step reveal"><div class="num">2</div><h3>See what's next</h3><p>The likely continuation appears in soft gray, right where your cursor is — predicted by a model running on your Mac.</p></div>
+        <div class="step reveal"><div class="num">3</div><h3>Press to keep it</h3><p>Tab takes a word, the backtick takes the whole line, Esc waves it off. Ignore it and it quietly disappears.</p></div>
+      </div>
+      <div class="privacy-banner reveal">
+        <span class="lock">🔒</span>
+        <span>The model runs <b>entirely on your device</b> — Apple Foundation Models or a local Ollama. What you type is never sent anywhere.</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- GET STARTED -->
+<section id="start">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Get started</span>
+      <h2>Up and running <em>in a couple of minutes.</em></h2>
+    </div>
+    <div class="start-grid">
+      <div class="reqs reveal">
+        <h3>What you'll need</h3>
+        <ul>
+          <li><span class="ck">✓</span><span><b>An Apple Silicon Mac</b> <span class="t">— M1 or newer (the app is arm64).</span></span></li>
+          <li><span class="ck">✓</span><span><b>macOS 14 or later</b> <span class="t">— Apple's on-device model needs macOS 26 + Apple Intelligence.</span></span></li>
+          <li><span class="ck">✓</span><span><b>A local model</b> <span class="t">— Apple Foundation Models (no download), or <code style="font-family:var(--mono);font-size:.85em">ollama pull</code> a small model.</span></span></li>
+          <li><span class="ck">✓</span><span><b>Two permissions</b> <span class="t">— Accessibility &amp; Input Monitoring, granted once in System Settings.</span></span></li>
+        </ul>
+      </div>
+      <div class="install reveal">
+        <ol>
+          <li><h4>Download &amp; unzip</h4><p>Grab the latest <b>MindReader.zip</b> and move <b>Mind&nbsp;Reader.app</b> into your Applications folder.</p></li>
+          <li><h4>Clear the quarantine flag</h4><p>The app is self-signed, so remove the download flag in Terminal:</p><code class="codeblock">xattr -dr com.apple.quarantine <span class="c">"/Applications/Mind Reader.app"</span></code></li>
+          <li><h4>Open it the first time</h4><p>Right-click the app → <b>Open</b>. macOS asks once; after that it just launches.</p></li>
+          <li><h4>Grant permissions</h4><p>In <b>System Settings → Privacy &amp; Security</b>, enable <b>Accessibility</b> and <b>Input Monitoring</b> (and optionally <b>Screen Recording</b> for screen context).</p></li>
+        </ol>
+        <a class="btn btn-primary" href="#download" style="margin-top:8px">Download Mind Reader</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding-top:0">
+  <div class="wrap" style="max-width:860px">
+    <div class="sec-head reveal" style="margin-bottom:30px">
+      <span class="sec-tag">FAQ</span>
+      <h2>Good questions.</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item reveal"><button class="faq-q">Is it really private? <span class="pm">+</span></button><div class="faq-a"><p>Yes. Suggestions are generated on your Mac — either by Apple's built-in Foundation Models or a local Ollama model on <code>localhost</code>. Nothing you type is sent to any server. Mind Reader can keep a small local history (in SQLite) to learn your style, and you can turn that off.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">Which apps does it work in? <span class="pm">+</span></button><div class="faq-a"><p>Any standard text field — native apps like Notes, Mail and TextEdit through macOS Accessibility, plus Electron and web apps like Slack and Chrome via a keystroke fallback. Code editors (VS&nbsp;Code, Cursor) aren't a focus and are best left disabled, mirroring the tools that inspired it.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">Why does macOS warn me when I first open it? <span class="pm">+</span></button><div class="faq-a"><p>Mind Reader is self-signed rather than distributed through the App Store — the Accessibility and event-tap APIs it relies on can't run in the App Store sandbox. Right-click → <b>Open</b> once and clear the quarantine flag, and you're set. Because every update uses the same signing certificate, your permissions survive upgrades.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">What does it cost? <span class="pm">+</span></button><div class="faq-a"><p>Nothing. Mind Reader is a free, personal experiment — no accounts, no plans, no usage limits. It was built as a native-Swift homage to <a href="https://cotypist.app" target="_blank" rel="noopener" style="color:var(--amber)">CoTypist</a>.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">Will it mess with my text or undo history? <span class="pm">+</span></button><div class="faq-a"><p>No. The suggestion is drawn in a separate floating overlay and never touches your actual field until you accept it. Ignore a suggestion and it simply fades — your document is untouched.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">How do I keep it updated? <span class="pm">+</span></button><div class="faq-a"><p>It updates itself. Mind Reader checks for new versions once a day (and on demand from the menu bar) and installs signed updates automatically — keeping your permissions intact.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="download">
+  <div class="wrap inner">
+    <img src="mindreader-icon.png" srcset="mindreader-icon.png 1x, mindreader-icon@2x.png 2x" alt="Mind Reader" class="reveal" />
+    <h2 class="reveal">Stop typing the <em>predictable&nbsp;part.</em></h2>
+    <p class="reveal">Install Mind Reader and let your Mac finish the sentences you were going to write anyway.</p>
+    <div class="hero-cta reveal" style="justify-content:center">
+      <a class="btn btn-primary" id="final-dl" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+        Download for Mac
+      </a>
+      <a class="btn btn-ghost" id="releases-link" href="#" target="_blank" rel="noopener">All releases</a>
+    </div>
+    <p class="req-note" style="margin-top:18px">Version 0.1.6 · Apple Silicon · macOS 14+ · ~150&nbsp;MB</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand"><img src="mindreader-icon.png" alt="" /> Mind Reader</div>
+      <p class="foot-meta" style="margin-top:12px">A free, personal experiment in local autocomplete for macOS — built in native Swift, running on-device with Apple Foundation Models or Ollama. Inspired by CoTypist.</p>
+    </div>
+    <div class="foot-links">
+      <a href="#features">Features</a>
+      <a href="#start">Install</a>
+      <a href="#faq">FAQ</a>
+      <a id="foot-releases" href="#" target="_blank" rel="noopener">Releases</a>
+    </div>
+  </div>
+</footer>
+
 <script>
-const REPO = "leonardoeloi/mindreader-releases";
-const COLORS = ["#8ab4ff","#7ce3b1","#ffd479","#ff9d9d","#c79bff","#7fd8e8"];
+  /* ---- Download links (single source of truth) ---- */
+  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.6.zip";
+  var RELEASES_URL = "https://github.com/leonardoeloi/mindreader-releases/releases";
+  ["nav-dl","hero-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",DOWNLOAD_URL);});
+  ["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",RELEASES_URL);});
 
-async function live() {
-  const r = await fetch(`https://api.github.com/repos/${REPO}/releases`);
-  const releases = await r.json();
-  const assets = releases.flatMap(rel => rel.assets.filter(a => a.name.endsWith(".zip")));
-  assets.sort((a,b) => a.name.localeCompare(b.name));
-  const total = assets.reduce((s,a) => s + a.download_count, 0);
-  document.getElementById("total").textContent = total;
-  document.getElementById("versions").textContent = assets.length;
-  const last = assets[assets.length-1];
-  if (last) {
-    document.getElementById("latest").textContent = last.download_count;
-    document.getElementById("latestLabel").textContent = `downloads — ${last.name.replace("MindReader-","").replace(".zip","")}`;
-  }
-  const tb = document.querySelector("#tbl tbody");
-  tb.innerHTML = assets.map(a =>
-    `<tr><td>${a.name}</td><td class="num">${a.download_count}</td><td>${new Date(a.updated_at).toLocaleDateString("pt-BR")}</td></tr>`
-  ).join("");
-}
+  /* ---- Nav shadow on scroll ---- */
+  var nav=document.getElementById("nav");
+  window.addEventListener("scroll",function(){nav.classList.toggle("scrolled",window.scrollY>12);},{passive:true});
 
-async function history() {
-  const r = await fetch("stats/history.json", {cache:"no-store"});
-  const hist = await r.json();
-  const names = [...new Set(hist.flatMap(h => h.assets.map(a => a.name)))].sort();
-  const datasets = names.map((n,i) => ({
-    label: n.replace("MindReader-","").replace(".zip",""),
-    data: hist.map(h => (h.assets.find(a => a.name===n) || {}).downloads ?? null),
-    borderColor: COLORS[i % COLORS.length],
-    backgroundColor: "transparent",
-    tension: .25, spanGaps: true, pointRadius: 3,
-  }));
-  new Chart(document.getElementById("chart"), {
-    type: "line",
-    data: { labels: hist.map(h => h.date), datasets },
-    options: {
-      plugins: { legend: { labels: { color: "#c9c9d1", boxWidth: 18 } } },
-      scales: {
-        x: { ticks: { color: "#9a9aa3" }, grid: { color: "rgba(255,255,255,.05)" } },
-        y: { beginAtZero: true, ticks: { color: "#9a9aa3", precision: 0 }, grid: { color: "rgba(255,255,255,.05)" } },
-      },
-    },
+  /* ---- Scroll reveal ---- */
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});
+  },{threshold:.14});
+  document.querySelectorAll(".reveal").forEach(function(el,i){
+    el.style.transitionDelay=(Math.min(i%3,3)*70)+"ms";
+    io.observe(el);
   });
-}
 
-live().catch(e => console.error(e));
-history().catch(e => console.error(e));
+  /* ---- Feature card spotlight ---- */
+  document.querySelectorAll(".feat").forEach(function(card){
+    card.addEventListener("pointermove",function(e){
+      var r=card.getBoundingClientRect();
+      card.style.setProperty("--mx",(e.clientX-r.left)+"px");
+      card.style.setProperty("--my",(e.clientY-r.top)+"px");
+    });
+  });
+
+  /* ---- FAQ accordion ---- */
+  document.querySelectorAll(".faq-item").forEach(function(item){
+    var q=item.querySelector(".faq-q"),a=item.querySelector(".faq-a");
+    q.addEventListener("click",function(){
+      var open=item.classList.contains("open");
+      document.querySelectorAll(".faq-item.open").forEach(function(o){o.classList.remove("open");o.querySelector(".faq-a").style.maxHeight=null;});
+      if(!open){item.classList.add("open");a.style.maxHeight=a.scrollHeight+"px";}
+    });
+  });
+
+  /* ---- Live ghost-text demo ---- */
+  (function(){
+    var reduce=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    var typedEl=document.getElementById("demo-typed");
+    var ghostEl=document.getElementById("demo-ghost");
+    var hint=document.getElementById("key-hint");
+    var scenes=[
+      {base:"Thanks for the quick turnaround — ", ghost:"I'll review it this afternoon and send notes."},
+      {base:"Hey team, the deploy is live. ", ghost:"Everything looks green on staging so far."},
+      {base:"Let's circle back on this ", ghost:"after the sync tomorrow morning."},
+      {base:"Really appreciate you flagging that. ", ghost:"I'll get a fix out before end of day."}
+    ];
+    if(reduce){
+      typedEl.textContent=scenes[0].base;
+      ghostEl.textContent=scenes[0].ghost;
+      return;
+    }
+    var si=0;
+    function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+    async function run(){
+      while(true){
+        var s=scenes[si];
+        typedEl.textContent=""; ghostEl.textContent=""; hint.classList.remove("show");
+        // type the base text
+        for(var i=0;i<s.base.length;i++){
+          typedEl.textContent=s.base.slice(0,i+1);
+          await sleep(28+Math.random()*45);
+        }
+        await sleep(280);
+        // ghost appears word by word (streaming)
+        var words=s.ghost.split(" ");
+        for(var w=0;w<words.length;w++){
+          ghostEl.textContent=words.slice(0,w+1).join(" ");
+          if(w===0)hint.classList.add("show");
+          await sleep(75);
+        }
+        await sleep(620);
+        // accept word by word with Tab
+        for(var k=0;k<words.length;k++){
+          typedEl.textContent=s.base+words.slice(0,k+1).join(" ")+(k<words.length-1?" ":"");
+          ghostEl.textContent=(k<words.length-1?" ":"")+words.slice(k+1).join(" ");
+          await sleep(135);
+        }
+        ghostEl.textContent="";
+        hint.classList.remove("show");
+        await sleep(1700);
+        si=(si+1)%scenes.length;
+      }
+    }
+    run();
+  })();
 </script>
 </body>
 </html>
