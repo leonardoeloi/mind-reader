@@ -528,7 +528,7 @@
       </a>
       <a class="btn btn-ghost" id="releases-link" href="#" target="_blank" rel="noopener">All releases</a>
     </div>
-    <p class="req-note" style="margin-top:18px">Version 0.1.6 · Apple Silicon · macOS 14+ · ~150&nbsp;MB</p>
+    <p class="req-note" style="margin-top:18px">Version <span id="ver">0.1.7</span> · Apple Silicon · macOS 14+ · ~150&nbsp;MB</p>
   </div>
 </section>
 
@@ -549,11 +549,25 @@
 </footer>
 
 <script>
-  /* ---- Download links (single source of truth) ---- */
-  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.6.zip";
+  /* ---- Download links ----
+     Fallback URLs below are used if the appcast can't be read. The real download
+     button is then re-pointed at the LATEST build by parsing appcast.xml (same
+     origin, served from this site's root) — so it never goes stale per release. */
+  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mindreader-releases/releases/download/appcast/MindReader-0.1.7.zip";
   var RELEASES_URL = "https://github.com/leonardoeloi/mindreader-releases/releases";
-  ["nav-dl","hero-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",DOWNLOAD_URL);});
-  ["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",RELEASES_URL);});
+  function setDownload(url){["nav-dl","hero-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
+  function setReleases(url){["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
+  setDownload(DOWNLOAD_URL); setReleases(RELEASES_URL);
+
+  fetch("appcast.xml",{cache:"no-store"}).then(function(r){return r.ok?r.text():Promise.reject();}).then(function(xml){
+    var item=new DOMParser().parseFromString(xml,"application/xml").getElementsByTagName("item")[0];
+    if(!item)return;
+    var enc=item.getElementsByTagName("enclosure")[0];
+    if(enc&&enc.getAttribute("url"))setDownload(enc.getAttribute("url"));
+    var vEl=item.getElementsByTagName("sparkle:shortVersionString")[0]||item.getElementsByTagName("title")[0];
+    var ver=document.getElementById("ver");
+    if(ver&&vEl&&vEl.textContent.trim())ver.textContent=vEl.textContent.trim();
+  }).catch(function(){/* keep fallback URL + version */});
 
   /* ---- Nav shadow on scroll ---- */
   var nav=document.getElementById("nav");
