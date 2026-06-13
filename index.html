@@ -577,8 +577,11 @@
     });});
   })();
 
-  /* ---- Download links: fallback constants, re-pointed at the latest build from appcast.xml. ---- */
-  var DOWNLOAD_URL = "https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.18.zip";
+  /* ---- Download: the human installer is the BRANDED .dmg (drag-to-Applications) of the current
+     version. The appcast .zip is used ONLY by Sparkle's in-app auto-updater, never as the human
+     download. The DMG URL is derived from the appcast version so it always matches the latest. ---- */
+  var DL_BASE = "https://github.com/leonardoeloi/mind-reader/releases/download/appcast/";
+  var DOWNLOAD_URL = DL_BASE + "MindReader-0.1.18.dmg";   // fallback (release.sh keeps the version current)
   var RELEASES_URL = "https://github.com/leonardoeloi/mind-reader/releases";
   function setDownload(url){["nav-dl","hero-dl","install-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
   function setReleases(url){["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
@@ -587,10 +590,9 @@
   fetch("appcast.xml",{cache:"no-store"}).then(function(r){return r.ok?r.text():Promise.reject();}).then(function(xml){
     var item=new DOMParser().parseFromString(xml,"application/xml").getElementsByTagName("item")[0];
     if(!item)return;
-    var enc=item.getElementsByTagName("enclosure")[0];
-    if(enc&&enc.getAttribute("url"))setDownload(enc.getAttribute("url"));
     var vEl=item.getElementsByTagName("sparkle:shortVersionString")[0]||item.getElementsByTagName("title")[0];
     if(vEl&&vEl.textContent.trim()){var v=vEl.textContent.trim();
+      setDownload(DL_BASE+"MindReader-"+v+".dmg");
       ["ver","ver-hero","ver-nav"].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=v;});}
   }).catch(function(){});
 
