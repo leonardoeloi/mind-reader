@@ -123,24 +123,24 @@
   body>*:not(.atmos){position:relative;z-index:1}
 
   /* ============ LOGO MARK (rebuilt from the logo: squircle + caret + 3 confidence pips, alive) ============ */
+  /* Canonical mark = the app icon: caret + 3 fading "ghost word" pills (decreasing width + value). */
   .mark{width:30px;height:30px;border-radius:9px;background:var(--mark-bg);
-    display:inline-flex;align-items:center;justify-content:center;gap:2.5px;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;gap:1.6px;flex-shrink:0;
     box-shadow:0 1px 0 rgba(255,255,255,.06) inset, var(--chip-shadow)}
-  .mark .caret{width:2.5px;height:13px;border-radius:2px;background:var(--mark-caret)}
-  .mark .pip{width:4px;height:4px;border-radius:50%;background:var(--mark-caret)}
-  .mark .pip.b{background:var(--g2)}
-  .mark .pip.c{background:var(--g3)}
-  .mark .pip{animation:pip-fade 3.4s var(--ease) infinite}
-  .mark .pip.a{animation-delay:0s}
-  .mark .pip.b{animation-delay:.32s}
-  .mark .pip.c{animation-delay:.64s}
+  .mark .caret{width:2.2px;height:6.5px;border-radius:1.5px;background:var(--mark-caret)}
+  .mark .pip{height:4px;border-radius:2px;background:var(--mark-caret);animation:pip-fade 3.4s var(--ease) infinite}
+  .mark .pip.a{width:9px;animation-delay:0s}
+  .mark .pip.b{width:6.5px;background:var(--g2);animation-delay:.32s}
+  .mark .pip.c{width:3.7px;background:var(--g3);animation-delay:.64s}
   @keyframes pip-fade{0%,72%,100%{opacity:1}82%{opacity:.28}}
-  /* large animated brand mark (showcase) — blinking caret + cascading confidence pips */
-  .mark-xl{width:74px;height:74px;border-radius:20px;gap:5px}
-  .mark-xl .caret{width:5px;height:30px;border-radius:3px;animation:caret 1.08s steps(1) infinite}
-  .mark-xl .pip{width:9px;height:9px;animation:pip-cascade 2.6s var(--ease) infinite}
-  .mark-xl .pip.a{animation-delay:0s}.mark-xl .pip.b{animation-delay:.22s}.mark-xl .pip.c{animation-delay:.44s}
-  @keyframes pip-cascade{0%,52%,100%{opacity:1;transform:scale(1)}66%{opacity:.25;transform:scale(.8)}}
+  /* large animated brand mark (showcase) — blinking caret + cascading fading pills */
+  .mark-xl{width:74px;height:74px;border-radius:20px;gap:4px}
+  .mark-xl .caret{width:5.5px;height:16px;border-radius:3px;animation:caret 1.08s steps(1) infinite}
+  .mark-xl .pip{height:10px;border-radius:5px;animation:pip-cascade 2.6s var(--ease) infinite}
+  .mark-xl .pip.a{width:22px;animation-delay:0s}
+  .mark-xl .pip.b{width:16px;animation-delay:.22s}
+  .mark-xl .pip.c{width:9px;animation-delay:.44s}
+  @keyframes pip-cascade{0%,52%,100%{opacity:1;transform:scaleX(1)}66%{opacity:.3;transform:scaleX(.82)}}
 
   /* ============ BUTTONS ============ */
   .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:600;
