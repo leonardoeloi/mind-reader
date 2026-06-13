@@ -30,9 +30,11 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 - **Inline ghost text, everywhere** — the same completion in Mail, Notes, Slack, a browser address bar or a search box. One behaviour, system-wide.
 - **100% on-device** — runs on Apple's built-in Foundation Models (Apple Intelligence) **or** a bundled local Ollama model on `localhost`. No account, no server, no telemetry.
 - **Word by word, or the whole line** — <kbd>Tab</kbd> takes the next word (chain it); a single key takes the entire suggestion; <kbd>Esc</kbd> waves it off.
-- **It learns your voice** — few-shot learning from what you accept, an auto-built glossary of your own jargon/acronyms, and an optional style document.
+- **It learns your voice** — few-shot learning from what you accept, an auto-built glossary of your own jargon/acronyms, and an optional style document. Review or forget individual examples, or switch learning off entirely, in **Privacy & Data**.
 - **Per-app instructions** — different guidance for email, chat and notes, layered on a global style.
-- **Context-aware, on your terms** — reads your clipboard, the text after the cursor, and (only if you allow it) what's on screen via on-device OCR.
+- **Context-aware, on your terms** — reads your clipboard, the text after the cursor, and (only if you allow it) what's on screen via on-device OCR. Each source is its own switch in **Privacy & Data** — turn any of them off whenever you like.
+- **Never reads your secrets** — skips secure (password) fields entirely, and ignores clipboard items your password manager marks as concealed. What you type into a password box is never read, suggested, or stored.
+- **VoiceOver-aware** — each suggestion is announced to VoiceOver, with the accept/dismiss keys, so the ghost text isn't invisible to screen-reader users.
 - **You set how much it writes** — short (a nudge), medium, or most of a sentence.
 - **A quiet, local record** — a dashboard tallies words completed, rough time saved and acceptance rate, with a per-day chart and a daily streak. Lives in a SQLite file you can open or export — nothing leaves the Mac.
 - **Pixel-aligned overlay** — matches the field's real font size, follows you across displays (multi-monitor honest), and never touches your field or undo history.
@@ -42,6 +44,8 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 ## Privacy
 
 Everything is generated on your Mac. There is **no account, no sync, no server to opt out of — because there is no server.** What you type is never transmitted, logged, or used to train anything. The model and your text live in the same place: your machine.
+
+And you stay in control of what feeds a suggestion. A **Privacy & Data** panel in Preferences lets you switch clipboard context and learning-from-what-you-accept on or off, review or forget individual learned examples, and clear the local history. Mind Reader also **never reads secure (password) fields**, or clipboard items your password manager marks as concealed — secrets are never read, suggested, or stored.
 
 ## The four keys — that's the entire interface
 
@@ -77,6 +81,8 @@ It keeps itself updated: a gentle "update available" note appears in the menu ba
 <summary><strong>Is it really private?</strong></summary>
 
 Yes. Suggestions are generated on your Mac — by Apple's built-in Foundation Models or a local Ollama model on `localhost`. Nothing you type is sent to any server. A small local history (SQLite) is kept on your Mac to learn your style and is never uploaded.
+
+You're also in control of what informs a suggestion. In **Preferences → Privacy & Data** you can switch clipboard context and learning on or off, review or forget individual learned examples, and clear the history. And Mind Reader **never reads secure (password) fields** or clipboard items your password manager flags as concealed — what you type into a password box is never read, suggested, or stored.
 </details>
 
 <details>
