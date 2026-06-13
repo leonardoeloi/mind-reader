@@ -8,10 +8,10 @@
 ![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-0a0a0b?style=flat-square)
 ![On-device](https://img.shields.io/badge/inference-100%25_on--device-0a0a0b?style=flat-square)
 ![Native Swift](https://img.shields.io/badge/native-Swift-0a0a0b?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.1.24-0a0a0b?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.25-0a0a0b?style=flat-square)
 ![Price](https://img.shields.io/badge/price-free-0a0a0b?style=flat-square)
 
-### [⬇&nbsp; Download for Mac](https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.24.dmg) &nbsp;·&nbsp; [Website](https://leonardoeloi.github.io/mind-reader/) &nbsp;·&nbsp; [All releases](https://github.com/leonardoeloi/mind-reader/releases)
+### [⬇&nbsp; Download for Mac](https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.25.dmg) &nbsp;·&nbsp; [Website](https://leonardoeloi.github.io/mind-reader/) &nbsp;·&nbsp; [All releases](https://github.com/leonardoeloi/mind-reader/releases)
 
 </div>
 
@@ -65,7 +65,7 @@ Everything is generated on your Mac. There is **no account, no sync, no server t
 
 ## Install
 
-1. **[Download the DMG](https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.24.dmg)** and drag **Mind Reader** into your Applications folder.
+1. **[Download the DMG](https://github.com/leonardoeloi/mind-reader/releases/download/appcast/MindReader-0.1.25.dmg)** and drag **Mind Reader** into your Applications folder.
 2. **First launch:** Mind Reader is signed by its author, not the App Store (the Accessibility & key-tap APIs it needs can't run in the sandbox). On the *"could not verify"* notice, click **Done**, then **System Settings → Privacy & Security → Open Anyway** — once per Mac. Comfortable in Terminal? `xattr -dr com.apple.quarantine "/Applications/Mind Reader.app"`
 3. **Grant the two permissions** in Privacy & Security (Accessibility + Input Monitoring), pick a model in Preferences, and start typing.
 
