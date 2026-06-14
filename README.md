@@ -37,7 +37,7 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 - **VoiceOver-aware** — each suggestion is announced to VoiceOver, with the accept/dismiss keys, so the ghost text isn't invisible to screen-reader users.
 - **You set how much it writes** — short (a nudge), medium, or most of a sentence.
 - **A quiet, local record** — a dashboard tallies words completed, rough time saved and acceptance rate, with a per-day chart and a daily streak. Lives in a SQLite file you can open or export — nothing leaves the Mac.
-- **Pixel-aligned overlay** — matches the field's real font size, follows you across displays (multi-monitor honest), and never touches your field or undo history.
+- **Reads like your own text** — the ghost matches the field's real font **size and typeface** (in apps like Slack it even renders in the app's own font), lands exactly where your next character will, follows you across displays (multi-monitor honest), and never touches your field or undo history.
 - **Streaming suggestions** *(local Ollama models)* — words appear as the model produces them, so it feels instant.
 - **Inline autocorrect** *(experimental, off by default)* — quietly fixes a high-confidence typo in the word you just finished.
 
