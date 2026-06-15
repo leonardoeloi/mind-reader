@@ -3,114 +3,298 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mind Reader — Dashboard</title>
+<title>Mind Reader — adoção</title>
+<meta name="description" content="Downloads e adoção do Mind Reader por versão. Sem telemetria.">
+<link rel="icon" href="mindreader-icon.png">
+<script>(function(){var t;try{t=localStorage.getItem("mr-theme")}catch(e){}if(!t)t=matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";if(t==="light")document.documentElement.setAttribute("data-theme","light")})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; margin: 0; }
-  body { background:#0b0b0d; color:#ececf1; font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; padding:40px 24px; }
-  .wrap { max-width: 880px; margin: 0 auto; }
-  header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
-  .logo { width:52px; height:52px; border-radius:12px; background:linear-gradient(#18181b,#000); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; }
-  h1 { font-size:22px; font-weight:600; }
-  .sub { color:#9a9aa3; font-size:13px; }
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:22px 0; }
-  .card { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px 18px; }
-  .card .n { font-size:30px; font-weight:650; letter-spacing:-.5px; }
-  .card .l { color:#9a9aa3; font-size:12px; margin-top:2px; }
-  .panel { background:#141417; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:18px; margin-bottom:14px; }
-  h2 { font-size:14px; font-weight:600; color:#c9c9d1; margin-bottom:12px; }
-  table { width:100%; border-collapse:collapse; font-size:14px; }
-  td, th { text-align:left; padding:7px 4px; border-bottom:1px solid rgba(255,255,255,.06); }
-  th { color:#9a9aa3; font-weight:500; font-size:12px; }
-  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
-  footer { color:#6d6d76; font-size:12px; margin-top:22px; }
-  a { color:#8ab4ff; text-decoration:none; }
+  :root{
+    --bg:#0a0a0b; --surface:#18181c; --fg:#f4f3ef; --fg-2:#c9c8c3; --muted:#94938e;
+    --line:rgba(244,243,239,.09); --line-2:rgba(244,243,239,.17);
+    --g0:#f4f3ef; --g1:#b7b6b1; --g2:#8c8b88; --g3:#626166; --g4:#45444a;
+    --disp:"Schibsted Grotesk",system-ui,sans-serif;
+    --sans:"Hanken Grotesk",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  :root[data-theme="light"]{
+    --bg:#F4F2ED; --surface:#FBFAF7; --fg:#15130F; --fg-2:#403D37; --muted:#6B6862;
+    --line:#DCD8CF; --line-2:#C7C2B6;
+    --g0:#15130F; --g1:#4A4742; --g2:#716d64; --g3:#B4B0A6; --g4:#DAD6CC;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;padding:40px 24px 72px;transition:background .25s,color .25s}
+  .wrap{max-width:920px;margin:0 auto}
+  a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line-2);transition:border-color .2s}
+  a:hover{border-color:var(--fg)}
+
+  /* Header */
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .mark{width:46px;height:46px;border-radius:11px;background:var(--surface);border:1px solid var(--line-2);
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .htext{flex:1;min-width:0}
+  h1{font-family:var(--disp);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .sub{color:var(--muted);font-size:.82rem;margin-top:1px}
+  .theme{appearance:none;background:var(--surface);border:1px solid var(--line-2);color:var(--fg-2);
+    width:38px;height:38px;border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;
+    justify-content:center;transition:transform .2s,border-color .2s,background .2s}
+  .theme:hover{border-color:var(--fg);color:var(--fg)}
+  .theme:active{transform:scale(.95)}
+  .theme:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+  .meta{font-family:var(--mono);font-size:.66rem;letter-spacing:.05em;color:var(--muted);
+    text-transform:uppercase;margin:14px 0 26px}
+  .meta b{color:var(--fg-2);font-weight:500}
+
+  /* Metric cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:30px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .card.hi{border-color:var(--line-2)}
+  .card .n{font-family:var(--disp);font-size:2rem;font-weight:800;letter-spacing:-.03em;line-height:1;
+    font-variant-numeric:tabular-nums;color:var(--fg)}
+  .card .l{font-family:var(--mono);font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--muted);margin-top:9px;line-height:1.5}
+
+  /* Panels */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px}
+  .panel h2{font-family:var(--disp);font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+  .panel .h2sub{color:var(--muted);font-size:.8rem;margin:2px 0 18px}
+  .canvas-box{position:relative}
+
+  /* Table (details) */
+  details{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden}
+  summary{padding:16px 22px;cursor:pointer;font-family:var(--disp);font-weight:600;font-size:1rem;
+    list-style:none;display:flex;align-items:center;justify-content:space-between;user-select:none}
+  summary::-webkit-details-marker{display:none}
+  summary .chev{font-family:var(--mono);color:var(--muted);transition:transform .25s}
+  details[open] summary .chev{transform:rotate(90deg)}
+  .tbl-scroll{padding:0 22px 18px;max-height:420px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  thead th{position:sticky;top:0;background:var(--surface);font-family:var(--mono);font-weight:400;
+    font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  td.v{font-family:var(--mono);font-size:.84rem;color:var(--fg)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.latest td{color:var(--fg)}
+  tr.latest td.v::after{content:"latest";font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--bg);background:var(--fg);padding:1px 6px;border-radius:5px;margin-left:8px;vertical-align:1px}
+  td.muted{color:var(--muted)}
+
+  /* States */
+  .state{color:var(--muted);font-size:.9rem;padding:30px 0;text-align:center}
+  .state.err{color:#d98a8a}
+  .skeleton{color:var(--g4)}
+
+  footer{color:var(--muted);font-size:.8rem;line-height:1.7;margin-top:28px;border-top:1px solid var(--line);padding-top:20px}
+  footer .dot{color:var(--line-2);margin:0 8px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="logo" aria-hidden="true">
-      <svg width="34" height="24" viewBox="0 0 20 14"><g fill="#fff"><rect x="1.8" y="1.2" width="3.2" height="11.6" rx="1.6"/><rect x="6.6" y="4.5" width="7.4" height="5" rx="2.5" opacity=".95"/><rect x="15.2" y="4.5" width="4" height="5" rx="2" opacity=".5"/></g></svg>
+    <span class="mark" aria-hidden="true">
+      <svg width="30" height="21" viewBox="0 0 20 14"><g fill="currentColor"><rect x="1.8" y="1.2" width="3.2" height="11.6" rx="1.6"/><rect x="6.6" y="4.5" width="7.4" height="5" rx="2.5" opacity=".92"/><rect x="15.2" y="4.5" width="4" height="5" rx="2" opacity=".5"/></g></svg>
+    </span>
+    <div class="htext">
+      <h1>Adoção</h1>
+      <div class="sub">Mind Reader — downloads &amp; updates por versão</div>
     </div>
-    <div>
-      <h1>Mind Reader</h1>
-      <div class="sub">Dashboard de adoção — downloads e updates por versão</div>
-    </div>
+    <button class="theme" id="theme" type="button" aria-label="Alternar tema" title="Tema">◐</button>
   </header>
+  <div class="meta" id="freshness">carregando…</div>
 
-  <div class="cards">
-    <div class="card"><div class="n" id="total">…</div><div class="l">downloads totais (todas as versões)</div></div>
-    <div class="card"><div class="n" id="latest">…</div><div class="l" id="latestLabel">downloads da versão mais recente</div></div>
-    <div class="card"><div class="n" id="versions">…</div><div class="l">versões publicadas</div></div>
-  </div>
+  <section class="cards" id="cards" aria-label="Resumo">
+    <div class="card hi"><div class="n skeleton" id="total">—</div><div class="l">downloads totais</div></div>
+    <div class="card"><div class="n skeleton" id="installs">—</div><div class="l">instalações · .dmg</div></div>
+    <div class="card"><div class="n skeleton" id="updates">—</div><div class="l">updates · sparkle .zip</div></div>
+    <div class="card"><div class="n skeleton" id="versions">—</div><div class="l">versões publicadas</div></div>
+  </section>
 
-  <div class="panel">
-    <h2>Adoção ao longo do tempo (snapshot diário)</h2>
-    <canvas id="chart" height="110"></canvas>
-  </div>
+  <section class="panel">
+    <h2>Downloads ao longo do tempo</h2>
+    <div class="h2sub">Total acumulado, snapshot diário</div>
+    <div class="canvas-box" style="height:240px"><canvas id="lineChart"></canvas></div>
+    <div class="state" id="lineState" hidden></div>
+  </section>
 
-  <div class="panel">
-    <h2>Por versão (ao vivo, via API do GitHub)</h2>
-    <table id="tbl"><thead><tr><th>Asset</th><th class="num">Downloads</th><th>Última atualização</th></tr></thead><tbody></tbody></table>
-  </div>
+  <section class="panel">
+    <h2>Downloads por versão</h2>
+    <div class="h2sub">Instalação + updates de cada versão, da mais recente para a mais antiga</div>
+    <div class="canvas-box" id="barBox" style="height:300px"><canvas id="barChart"></canvas></div>
+    <div class="state" id="barState" hidden></div>
+  </section>
+
+  <details>
+    <summary>Todas as versões <span class="chev">›</span></summary>
+    <div class="tbl-scroll">
+      <table id="tbl">
+        <thead><tr>
+          <th>Versão</th><th class="num">Instalações</th><th class="num">Updates</th>
+          <th class="num">Total</th><th>Atualizado</th>
+        </tr></thead>
+        <tbody><tr><td colspan="5" class="state skeleton">carregando…</td></tr></tbody>
+      </table>
+    </div>
+  </details>
 
   <footer>
-    Fonte: contagem pública de downloads dos assets de release (cada update via Sparkle conta um download).
-    Nenhuma telemetria roda no app — <a href="https://github.com/leonardoeloi/mind-reader">repo</a>.
+    Cada <b>update</b> via Sparkle conta um download do <code>.zip</code>; o <code>.dmg</code> é o instalador
+    (download humano do site). Contagem pública dos assets de release — <b>nenhuma telemetria roda no app</b>.
+    <br>
+    <a href="./">← site</a><span class="dot">·</span><a href="https://github.com/leonardoeloi/mind-reader/releases" target="_blank" rel="noopener">releases</a>
   </footer>
 </div>
 
 <script>
+"use strict";
 const REPO = "leonardoeloi/mind-reader";
-const COLORS = ["#8ab4ff","#7ce3b1","#ffd479","#ff9d9d","#c79bff","#7fd8e8"];
+const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = n => n.toLocaleString("pt-BR");
 
-async function live() {
+// hex (#rrggbb) → rgba(); só os --g/--fg são hex (no dark e no light).
+function rgba(hex, a){
+  const h = hex.replace("#","");
+  const x = h.length === 3 ? h.split("").map(c=>c+c).join("") : h;
+  const r = parseInt(x.slice(0,2),16), g = parseInt(x.slice(2,4),16), b = parseInt(x.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+const verOf = name => name.replace("MindReader-","").replace(/\.(zip|dmg)$/,"");
+function cmpVer(a,b){ // semver-ish: "0.1.40" vs "0.1.9"
+  const pa=a.split(".").map(Number), pb=b.split(".").map(Number);
+  for(let i=0;i<Math.max(pa.length,pb.length);i++){ if((pa[i]||0)!==(pb[i]||0)) return (pa[i]||0)-(pb[i]||0); }
+  return 0;
+}
+
+let DATA = null;        // { versions:[{ver,dmg,zip,total,updated}], latest }
+let HIST = null;        // [{date, total}]
+let lineChart, barChart;
+
+async function loadLive(){
   const r = await fetch(`https://api.github.com/repos/${REPO}/releases`);
+  if(!r.ok) throw new Error("GitHub API "+r.status);
   const releases = await r.json();
-  const assets = releases.flatMap(rel => rel.assets.filter(a => a.name.endsWith(".zip")));
-  assets.sort((a,b) => a.name.localeCompare(b.name));
-  const total = assets.reduce((s,a) => s + a.download_count, 0);
-  document.getElementById("total").textContent = total;
-  document.getElementById("versions").textContent = assets.length;
-  const last = assets[assets.length-1];
-  if (last) {
-    document.getElementById("latest").textContent = last.download_count;
-    document.getElementById("latestLabel").textContent = `downloads — ${last.name.replace("MindReader-","").replace(".zip","")}`;
+  const assets = releases.flatMap(rel => rel.assets || []);
+  const byVer = new Map();
+  for(const a of assets){
+    if(!/\.(zip|dmg)$/.test(a.name)) continue;
+    const v = verOf(a.name);
+    const e = byVer.get(v) || { ver:v, dmg:0, zip:0, updated:0 };
+    if(a.name.endsWith(".dmg")) e.dmg += a.download_count; else e.zip += a.download_count;
+    e.updated = Math.max(e.updated, +new Date(a.updated_at));
+    byVer.set(v, e);
   }
+  const versions = [...byVer.values()].map(e => ({...e, total:e.dmg+e.zip}))
+                                       .sort((a,b)=>cmpVer(b.ver,a.ver)); // newest first
+  DATA = { versions, latest: versions[0] };
+  renderCards();
+  renderTable();
+  renderBar();
+}
+
+async function loadHistory(){
+  const r = await fetch("stats/history.json", {cache:"no-store"});
+  if(!r.ok) throw new Error("history "+r.status);
+  const hist = await r.json();
+  HIST = hist.map(h => ({ date:h.date, total:(h.assets||[]).reduce((s,a)=>s+(a.downloads||0),0) }));
+  renderLine();
+}
+
+function renderCards(){
+  const v = DATA.versions;
+  const total = v.reduce((s,e)=>s+e.total,0);
+  const installs = v.reduce((s,e)=>s+e.dmg,0);
+  const updates = v.reduce((s,e)=>s+e.zip,0);
+  set("total", fmt(total)); set("installs", fmt(installs));
+  set("updates", fmt(updates)); set("versions", fmt(v.length));
+  const f = document.getElementById("freshness");
+  f.innerHTML = DATA.latest ? `mais recente <b>v${DATA.latest.ver}</b> · ${fmt(DATA.latest.total)} downloads · ao vivo` : "";
+}
+function set(id, txt){ const el=document.getElementById(id); el.textContent=txt; el.classList.remove("skeleton"); }
+
+function renderTable(){
   const tb = document.querySelector("#tbl tbody");
-  tb.innerHTML = assets.map(a =>
-    `<tr><td>${a.name}</td><td class="num">${a.download_count}</td><td>${new Date(a.updated_at).toLocaleDateString("pt-BR")}</td></tr>`
+  tb.innerHTML = DATA.versions.map((e,i)=>
+    `<tr class="${i===0?'latest':''}"><td class="v">${e.ver}</td>`+
+    `<td class="num">${fmt(e.dmg)}</td><td class="num">${fmt(e.zip)}</td>`+
+    `<td class="num">${fmt(e.total)}</td>`+
+    `<td class="muted">${new Date(e.updated).toLocaleDateString("pt-BR",{day:"2-digit",month:"short"})}</td></tr>`
   ).join("");
 }
 
-async function history() {
-  const r = await fetch("stats/history.json", {cache:"no-store"});
-  const hist = await r.json();
-  const names = [...new Set(hist.flatMap(h => h.assets.map(a => a.name)))].sort();
-  const datasets = names.map((n,i) => ({
-    label: n.replace("MindReader-","").replace(".zip",""),
-    data: hist.map(h => (h.assets.find(a => a.name===n) || {}).downloads ?? null),
-    borderColor: COLORS[i % COLORS.length],
-    backgroundColor: "transparent",
-    tension: .25, spanGaps: true, pointRadius: 3,
-  }));
-  new Chart(document.getElementById("chart"), {
-    type: "line",
-    data: { labels: hist.map(h => h.date), datasets },
-    options: {
-      plugins: { legend: { labels: { color: "#c9c9d1", boxWidth: 18 } } },
-      scales: {
-        x: { ticks: { color: "#9a9aa3" }, grid: { color: "rgba(255,255,255,.05)" } },
-        y: { beginAtZero: true, ticks: { color: "#9a9aa3", precision: 0 }, grid: { color: "rgba(255,255,255,.05)" } },
-      },
-    },
+function renderBar(){
+  if(!DATA) return;
+  const box = document.getElementById("barBox");
+  const v = DATA.versions;
+  box.style.height = Math.max(220, v.length*24 + 40) + "px";
+  const n = v.length;
+  const colors = v.map((_,i)=> rgba(cv("--fg"), n<2 ? .9 : (0.95 - 0.62*(i/(n-1)))));  // newest bright → oldest faint
+  if(barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById("barChart"), {
+    type:"bar",
+    data:{ labels:v.map(e=>e.ver), datasets:[{ data:v.map(e=>e.total),
+      backgroundColor:colors, borderRadius:5, barThickness:13 }] },
+    options:{ indexAxis:"y", maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:tooltip(c=>`${c.raw} downloads`) },
+      scales:{
+        x:{ beginAtZero:true, ticks:{ precision:0, color:cv("--muted"), font:mono() }, grid:{ color:cv("--line"), drawBorder:false } },
+        y:{ ticks:{ color:cv("--fg-2"), font:mono() }, grid:{ display:false, drawBorder:false } },
+      } }
   });
 }
 
-live().catch(e => console.error(e));
-history().catch(e => console.error(e));
+function renderLine(){
+  if(!HIST) return;
+  if(lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type:"line",
+    data:{ labels:HIST.map(h=>h.date), datasets:[{ data:HIST.map(h=>h.total),
+      borderColor:cv("--fg"), borderWidth:2, backgroundColor:rgba(cv("--fg"), .08),
+      fill:true, tension:.3, pointRadius:0, pointHoverRadius:4, pointHoverBackgroundColor:cv("--fg") }] },
+    options:{ maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:tooltip(c=>`${c.raw} downloads`) },
+      scales:{
+        x:{ ticks:{ color:cv("--muted"), font:mono(), maxRotation:0, autoSkipPadding:16 }, grid:{ display:false, drawBorder:false } },
+        y:{ beginAtZero:true, ticks:{ precision:0, color:cv("--muted"), font:mono() }, grid:{ color:cv("--line"), drawBorder:false } },
+      } }
+  });
+}
+
+const mono = () => ({ family:"IBM Plex Mono, monospace", size:11 });
+function tooltip(label){
+  return { backgroundColor:cv("--bg"), borderColor:cv("--line-2"), borderWidth:1,
+    titleColor:cv("--fg"), bodyColor:cv("--fg-2"), padding:10, displayColors:false,
+    titleFont:{family:"Schibsted Grotesk",weight:"600"}, bodyFont:mono(),
+    callbacks:{ label } };
+}
+
+function fail(stateId, panelHidesCanvas, msg){
+  const s = document.getElementById(stateId);
+  if(s){ s.hidden=false; s.className="state err"; s.textContent=msg; }
+}
+
+// Re-render charts on theme change (Chart.js bakes colors at build time).
+document.getElementById("theme").addEventListener("click", ()=>{
+  const root = document.documentElement;
+  const light = root.getAttribute("data-theme")==="light";
+  if(light) root.removeAttribute("data-theme"); else root.setAttribute("data-theme","light");
+  try{ localStorage.setItem("mr-theme", light?"dark":"light"); }catch(e){}
+  renderLine(); renderBar();
+});
+
+loadLive().catch(e=>{
+  console.error(e);
+  document.getElementById("freshness").textContent = "falha ao carregar a API do GitHub (limite de taxa?). Tente recarregar em alguns minutos.";
+  fail("barState", true, "Não consegui carregar os dados ao vivo.");
+  document.querySelector("#tbl tbody").innerHTML = '<tr><td colspan="5" class="state err">Falha ao carregar.</td></tr>';
+});
+loadHistory().catch(e=>{
+  console.error(e);
+  fail("lineState", true, "Histórico ainda não disponível.");
+});
 </script>
 </body>
 </html>
