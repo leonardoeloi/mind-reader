@@ -451,7 +451,7 @@
       <a class="link" href="#requirements">Requirements</a>
       <a class="link" href="#install">Install</a>
       <a class="link" href="#faq">FAQ</a>
-      <span class="mono nav-folio" aria-hidden="true">v<span id="ver-nav">0.1.147</span> · on-device</span>
+      <span class="mono nav-folio" aria-hidden="true">v<span id="ver-nav">0.1.148</span> · on-device</span>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Toggle theme">
         <i class="ph ph-moon" aria-hidden="true"></i><i class="ph ph-sun" aria-hidden="true"></i>
       </button>
@@ -470,7 +470,7 @@
         <p class="lede">Mind Reader adds inline, ghost-text autocomplete to <b>every</b> text field on your Mac: Mail, Notes, Slack, your browser. The prediction runs <b>entirely on-device</b>. Type, glance, press Tab. Nothing you write leaves the machine.</p>
         <div class="hero-cta">
           <a class="btn btn-primary" id="hero-dl" href="#download"><i class="ph ph-apple-logo"></i> Download for Mac</a>
-          <span class="req-note">Free to start · <b>Apple&nbsp;Silicon</b> · macOS&nbsp;14+ · v<span id="ver-hero">0.1.147</span></span>
+          <span class="req-note">Free to start · <b>Apple&nbsp;Silicon</b> · macOS&nbsp;14+ · v<span id="ver-hero">0.1.148</span></span>
         </div>
       </div>
 
@@ -627,7 +627,7 @@
       <a class="btn btn-primary" id="final-dl" href="#"><i class="ph ph-apple-logo"></i> Download for Mac</a>
       <a class="btn btn-ghost" id="releases-link" href="#" target="_blank" rel="noopener">All releases</a>
     </div>
-    <p class="req-note" style="margin-top:20px">Version <span id="ver">0.1.147</span> · Apple&nbsp;Silicon · macOS&nbsp;14+ · ~165&nbsp;MB download</p>
+    <p class="req-note" style="margin-top:20px">Version <span id="ver">0.1.148</span> · Apple&nbsp;Silicon · macOS&nbsp;14+ · ~165&nbsp;MB download</p>
   </div>
 </section>
 
@@ -677,7 +677,7 @@
      version. The appcast .zip is used ONLY by Sparkle's in-app auto-updater, never as the human
      download. The DMG URL is derived from the appcast version so it always matches the latest. ---- */
   var DL_BASE = "https://github.com/leonardoeloi/mind-reader/releases/download/appcast/";
-  var DOWNLOAD_URL = DL_BASE + "MindReader-0.1.147.dmg";   // fallback (release.sh keeps the version current)
+  var DOWNLOAD_URL = DL_BASE + "MindReader-0.1.148.dmg";   // fallback (release.sh keeps the version current)
   var RELEASES_URL = "https://github.com/leonardoeloi/mind-reader/releases";
   function setDownload(url){["nav-dl","hero-dl","install-dl","final-dl"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
   function setReleases(url){["releases-link","foot-releases"].forEach(function(id){var e=document.getElementById(id);if(e)e.setAttribute("href",url);});}
