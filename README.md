@@ -28,7 +28,7 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 ## Features
 
 - **Inline ghost text, everywhere** — the same completion in Mail, Notes, Slack, a browser address bar or a search box. One behaviour, system-wide.
-- **100% on-device** — runs on Apple's built-in Foundation Models (Apple Intelligence) **or** a bundled local Ollama model on `localhost`. No account, no server, no telemetry.
+- **100% on-device** — runs on Apple's built-in Foundation Models (Apple Intelligence) **or** a local open model on an embedded llama.cpp engine, inside the app itself. No account, no server, no telemetry.
 - **Word by word, or the whole line** — <kbd>Tab</kbd> takes the next word (chain it); a single key takes the entire suggestion; <kbd>Esc</kbd> waves it off.
 - **It learns your voice** — few-shot learning from what you accept, an auto-built glossary of your own jargon/acronyms, and an optional style document. Review or forget individual examples, or switch learning off entirely, in **Privacy & Data**.
 - **Per-app instructions** — different guidance for email, chat and notes, layered on a global style.
@@ -38,7 +38,7 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 - **You set how much it writes** — short (a nudge), medium, or most of a sentence.
 - **A quiet, local record** — a dashboard tallies words completed, rough time saved and acceptance rate, with a per-day chart and a daily streak. Lives in a SQLite file you can open or export — nothing leaves the Mac.
 - **Reads like your own text** — the ghost matches the field's real font **size and typeface** (in apps like Slack it even renders in the app's own font), lands exactly where your next character will, follows you across displays (multi-monitor honest), and never touches your field or undo history.
-- **Streaming suggestions** *(local Ollama models)* — words appear as the model produces them, so it feels instant.
+- **Streaming suggestions** *(local models)* — words appear as the model produces them, and the engine reuses its work between keystrokes, so it feels instant.
 - **Inline autocorrect** *(experimental, off by default)* — quietly fixes a high-confidence typo in the word you just finished.
 
 ## Privacy
@@ -61,16 +61,16 @@ And you stay in control of what feeds a suggestion. A **Privacy & Data** panel i
 | | |
 |---|---|
 | **Mac** | Apple Silicon (M1 or newer) — ships as native `arm64`. Intel is not supported. |
-| **macOS** | 14 (Sonoma) or later. On newer systems with Apple Intelligence it uses the built-in model with no download; on macOS 14–15 it uses a local Ollama model. |
+| **macOS** | 14 (Sonoma) or later. On newer systems with Apple Intelligence it uses the built-in model with no download; on macOS 14–15 it uses a bundled local model. |
 | **Memory** | 8 GB RAM minimum, 16 GB comfortable (a larger model = sharper suggestions). |
-| **Disk** | ~150 MB app + the model (first model download is ~1–5 GB, once, then cached). |
+| **Disk** | ~500 MB app (~175 MB download) + the model (first model download is ~1–5 GB, once, then cached). |
 | **Permissions** | Accessibility & Input Monitoring (granted once). Screen Recording is **optional** (off by default). |
 | **Price** | Free — no account, no plan, no limits. |
 
 ## Install
 
 1. **[Download the DMG](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.156/MindReader-0.1.156.dmg)** and drag **Mind Reader** into your Applications folder.
-2. **First launch:** Mind Reader is signed by its author, not the App Store (the Accessibility & key-tap APIs it needs can't run in the sandbox). On the *"could not verify"* notice, click **Done**, then **System Settings → Privacy & Security → Open Anyway** — once per Mac. Comfortable in Terminal? `xattr -dr com.apple.quarantine "/Applications/Mind Reader.app"`
+2. **First launch:** the app is signed with an Apple Developer ID certificate and **notarized by Apple**, so Gatekeeper verifies it and it opens straight away — no security warnings, no "Open Anyway".
 3. **Grant the two permissions** in Privacy & Security (Accessibility + Input Monitoring), pick a model in Preferences, and start typing.
 
 It keeps itself updated: a gentle "update available" note appears in the menu bar; one click downloads and installs the EdDSA-signed update, keeping your permissions and settings intact.
@@ -80,7 +80,7 @@ It keeps itself updated: a gentle "update available" note appears in the menu ba
 <details>
 <summary><strong>Is it really private?</strong></summary>
 
-Yes. Suggestions are generated on your Mac — by Apple's built-in Foundation Models or a local Ollama model on `localhost`. Nothing you type is sent to any server. A small local history (SQLite) is kept on your Mac to learn your style and is never uploaded.
+Yes. Suggestions are generated on your Mac — by Apple's built-in Foundation Models or a local model running inside the app itself. Nothing you type is sent to any server. A small local history (SQLite) is kept on your Mac to learn your style and is never uploaded.
 
 You're also in control of what informs a suggestion. In **Preferences → Privacy & Data** you can switch clipboard context and learning on or off, review or forget individual learned examples, and clear the history. And Mind Reader **never reads secure (password) fields** or clipboard items your password manager flags as concealed — what you type into a password box is never read, suggested, or stored.
 </details>
@@ -98,9 +98,9 @@ No — and it's worth being honest about why. Google Docs draws your text onto a
 </details>
 
 <details>
-<summary><strong>Why does macOS warn me on first open?</strong></summary>
+<summary><strong>Is it safe to install? Why isn't it in the App Store?</strong></summary>
 
-It's self-signed rather than distributed through the App Store (the Accessibility and event-tap APIs it relies on can't run in the App Store sandbox). Click **Done**, then **Open Anyway** in Privacy & Security — once per Mac. Because every update uses the same signing certificate, your permissions survive upgrades.
+Mind Reader is signed with an Apple Developer ID certificate and **notarized by Apple** — every release goes through Apple's automated security scan, and macOS verifies that ticket on open, so it launches with no warnings. It's distributed outside the App Store only because the Accessibility and event-tap APIs it relies on can't run in the App Store sandbox. Because every update uses the same signing certificate, your permissions survive upgrades.
 </details>
 
 <details>
@@ -112,7 +112,7 @@ No. The suggestion is drawn in a separate floating overlay and never touches you
 ## Under the hood
 
 - **Native Swift**, a lightweight menu-bar app (no Dock icon) with a custom monochrome icon.
-- **On-device inference** via Apple Foundation Models or a bundled Ollama server (incl. MLX runners); reuses a system Ollama if one is running.
+- **On-device inference** via Apple Foundation Models or an embedded llama.cpp engine (Metal) running local GGUF models in-process, with KV-cache reuse between keystrokes.
 - **Field reading** through the macOS **Accessibility** APIs, with a keystroke/event-tap engine for Electron & web apps.
 - **A floating overlay** that mirrors the field's font and caret — it draws the ghost text without ever modifying your document; only an accepted word is typed.
 - **Auto-update** via [Sparkle](https://sparkle-project.org) with EdDSA signature verification; a stable signing certificate keeps your TCC permissions across upgrades.
