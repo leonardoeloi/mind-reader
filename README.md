@@ -9,7 +9,7 @@
 ![On-device](https://img.shields.io/badge/inference-100%25_on--device-0a0a0b?style=flat-square)
 ![Native Swift](https://img.shields.io/badge/native-Swift-0a0a0b?style=flat-square)
 ![Version](https://img.shields.io/badge/version-0.1.156-0a0a0b?style=flat-square)
-![Price](https://img.shields.io/badge/price-free-0a0a0b?style=flat-square)
+![Price](https://img.shields.io/badge/price-free_to_start-0a0a0b?style=flat-square)
 
 ### [⬇&nbsp; Download for Mac](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.156/MindReader-0.1.156.dmg) &nbsp;·&nbsp; [Website](https://leonardoeloi.github.io/mind-reader/) &nbsp;·&nbsp; [All releases](https://github.com/leonardoeloi/mind-reader/releases)
 
@@ -21,7 +21,7 @@
 
 > **The fade *is* the confidence.** Confident predictions read sharp; uncertain ones fade toward grey — so you always know how much to trust before you accept.
 
-It's a free, personal experiment in what a quiet, private autocomplete can feel like when it lives at the system layer instead of inside one app.
+It's a personal experiment in what a quiet, private autocomplete can feel like when it lives at the system layer instead of inside one app. The core autocomplete is **free forever**; the deeper personalization features are part of an optional **Pro** tier.
 
 ---
 
@@ -30,16 +30,16 @@ It's a free, personal experiment in what a quiet, private autocomplete can feel 
 - **Inline ghost text, everywhere** — the same completion in Mail, Notes, Slack, a browser address bar or a search box. One behaviour, system-wide.
 - **100% on-device** — runs on Apple's built-in Foundation Models (Apple Intelligence) **or** a local open model on an embedded llama.cpp engine, inside the app itself. No account, no server, no telemetry.
 - **Word by word, or the whole line** — <kbd>Tab</kbd> takes the next word (chain it); a single key takes the entire suggestion; <kbd>Esc</kbd> waves it off.
-- **It learns your voice** — few-shot learning from what you accept, an auto-built glossary of your own jargon/acronyms, and an optional style document. Review or forget individual examples, or switch learning off entirely, in **Privacy & Data**.
-- **Per-app instructions** — different guidance for email, chat and notes, layered on a global style.
-- **Context-aware, on your terms** — reads your clipboard, the text after the cursor, and (only if you allow it) what's on screen via on-device OCR. Each source is its own switch in **Privacy & Data** — turn any of them off whenever you like.
+- **It learns your voice** *(Pro)* — few-shot learning from what you accept, an auto-built glossary of your own jargon/acronyms, and an optional style document. Review or forget individual examples, or switch learning off entirely, in **Privacy & Data**.
+- **Per-app instructions** *(Pro)* — different guidance for email, chat and notes, layered on a global style.
+- **Context-aware, on your terms** *(Pro)* — reads your clipboard, the text after the cursor, and (only if you allow it) what's on screen via on-device OCR. Each source is its own switch in **Privacy & Data** — turn any of them off whenever you like.
 - **Never reads your secrets** — skips secure (password) fields entirely, and ignores clipboard items your password manager marks as concealed. What you type into a password box is never read, suggested, or stored.
 - **VoiceOver-aware** — each suggestion is announced to VoiceOver, with the accept/dismiss keys, so the ghost text isn't invisible to screen-reader users.
 - **You set how much it writes** — short (a nudge), medium, or most of a sentence.
 - **A quiet, local record** — a dashboard tallies words completed, rough time saved and acceptance rate, with a per-day chart and a daily streak. Lives in a SQLite file you can open or export — nothing leaves the Mac.
 - **Reads like your own text** — the ghost matches the field's real font **size and typeface** (in apps like Slack it even renders in the app's own font), lands exactly where your next character will, follows you across displays (multi-monitor honest), and never touches your field or undo history.
 - **Streaming suggestions** *(local models)* — words appear as the model produces them, and the engine reuses its work between keystrokes, so it feels instant.
-- **Inline autocorrect** *(experimental, off by default)* — quietly fixes a high-confidence typo in the word you just finished.
+- **Inline autocorrect** *(Pro · experimental, off by default)* — quietly fixes a high-confidence typo in the word you just finished.
 
 ## Privacy
 
@@ -65,7 +65,7 @@ And you stay in control of what feeds a suggestion. A **Privacy & Data** panel i
 | **Memory** | 8 GB RAM minimum, 16 GB comfortable (a larger model = sharper suggestions). |
 | **Disk** | ~500 MB app (~175 MB download) + the model (first model download is ~1–5 GB, once, then cached). |
 | **Permissions** | Accessibility & Input Monitoring (granted once). Screen Recording is **optional** (off by default). |
-| **Price** | Free — no account, no plan, no limits. |
+| **Price** | Free to start — the core autocomplete stays free forever, no account. Advanced features (screen context, personal glossary, per-app instructions and more) are part of **Pro**, after a 30-day free trial of everything. |
 
 ## Install
 
@@ -133,5 +133,5 @@ This is the **public home** for Mind Reader — the app's source lives in a sepa
 ---
 
 <div align="center">
-<sub>A free, personal experiment · native Swift, 100% on-device · <a href="https://leonardoeloi.github.io/mind-reader/">leonardoeloi.github.io/mind-reader</a></sub>
+<sub>A personal experiment · free core, optional Pro · native Swift, 100% on-device · <a href="https://leonardoeloi.github.io/mind-reader/">leonardoeloi.github.io/mind-reader</a></sub>
 </div>
