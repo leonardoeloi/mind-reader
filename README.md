@@ -8,10 +8,10 @@
 ![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-0a0a0b?style=flat-square)
 ![On-device](https://img.shields.io/badge/inference-100%25_on--device-0a0a0b?style=flat-square)
 ![Native Swift](https://img.shields.io/badge/native-Swift-0a0a0b?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.1.158-0a0a0b?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.159-0a0a0b?style=flat-square)
 ![Price](https://img.shields.io/badge/price-free_to_start-0a0a0b?style=flat-square)
 
-### [⬇&nbsp; Download for Mac](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.158/MindReader-0.1.158.dmg) &nbsp;·&nbsp; [Website](https://leonardoeloi.github.io/mind-reader/) &nbsp;·&nbsp; [All releases](https://github.com/leonardoeloi/mind-reader/releases)
+### [⬇&nbsp; Download for Mac](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.159/MindReader-0.1.159.dmg) &nbsp;·&nbsp; [Website](https://leonardoeloi.github.io/mind-reader/) &nbsp;·&nbsp; [All releases](https://github.com/leonardoeloi/mind-reader/releases)
 
 </div>
 
@@ -69,7 +69,7 @@ And you stay in control of what feeds a suggestion. A **Privacy & Data** panel i
 
 ## Install
 
-1. **[Download the DMG](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.158/MindReader-0.1.158.dmg)** and drag **Mind Reader** into your Applications folder.
+1. **[Download the DMG](https://github.com/leonardoeloi/mind-reader/releases/download/v0.1.159/MindReader-0.1.159.dmg)** and drag **Mind Reader** into your Applications folder.
 2. **First launch:** the app is signed with an Apple Developer ID certificate and **notarized by Apple**, so Gatekeeper verifies it and it opens straight away — no security warnings, no "Open Anyway".
 3. **Grant the two permissions** in Privacy & Security (Accessibility + Input Monitoring), pick a model in Preferences, and start typing.
 
